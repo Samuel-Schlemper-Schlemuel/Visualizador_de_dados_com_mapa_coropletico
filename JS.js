@@ -1,5 +1,21 @@
-const height = 600
-const width = 950
+const p_height = 600
+const p_width = 950
+const tela_height = window.innerHeight - 150
+const tela_width = window.innerWidth - 50
+const pro_height = (tela_height / p_height)
+const pro_width = (tela_width / p_width)
+var height, width, scale
+
+if(pro_height < pro_width){
+    height = Math.max(tela_height, (p_height / 2))
+    width = Math.max((p_width * pro_height), (p_width / 2))
+    scale = Math.max(pro_height, 0.5)
+} else {
+    height = Math.max((p_height * pro_width), (p_height / 2))
+    width = Math.max(tela_width, (p_width / 2))
+    scale = Math.max(pro_width, 0.5)
+}
+
 const colors = ['rgb(255, 230, 230)', 'rgb(255, 200, 200)', 'rgb(255, 150, 150)', 'rgb(255, 100, 100)', 'rgb(255, 100, 100)', 'rgb(255, 50, 50)', 'rgb(255, 0, 0)']
 
 const svg = d3.select(document.getElementById('grafico'))
@@ -20,6 +36,7 @@ d3.json('https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/
             .append('path')
             .attr('class', 'county')
             .attr('d', d3.geoPath())
+            .attr('transform', `scale(${scale})`)
             .style('fill', (d, i) => { 
                 for(object in educacao){
                     object = educacao[object]
