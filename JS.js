@@ -52,6 +52,15 @@ d3.json('https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/
             })
             .attr('d', d3.geoPath())
             .attr('transform', `scale(${scale})`)
+            .attr('data-fips', (d, i) => d.id)
+            .attr('data-education', function(d, i){
+                for(indece in educacao){
+                    object = educacao[indece]
+                    if(d.id === object.fips){
+                        return object.bachelorsOrHigher
+                    }
+                }
+            })
             .style('fill', (d, i) => { 
                 for(indece in educacao){
                     object = educacao[indece]
@@ -67,6 +76,14 @@ d3.json('https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/
                 d3.select(document.getElementById('grafico'))
                   .append('div')
                   .attr('id', 'tooltip')
+                  .attr('data-education', function(){
+                    for(indece in educacao){
+                        object = educacao[indece]
+                        if(d.id === object.fips){
+                            return object.bachelorsOrHigher
+                        }
+                    }
+                })
                   .html(function(){
                     for(indece in educacao){
                         object = educacao[indece]
