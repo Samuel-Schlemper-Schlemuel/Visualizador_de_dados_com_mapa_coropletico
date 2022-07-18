@@ -17,7 +17,7 @@ if(pro_height < pro_width){
 }
 
 const colors = ['rgb(255, 230, 230)', 'rgb(255, 200, 200)', 'rgb(255, 160, 160)', 'rgb(255, 120, 120)', 'rgb(255, 80, 80)', 'rgb(255, 40, 40)', 'rgb(255, 0, 0)']
-const index = ['2%', '12%', '21%', '30%', '39%', '48%', '57%', '67%']
+const index = ['3%', '12%', '21%', '30%', '39%', '48%', '57%', '66%']
 const grafico = d3.select(document.getElementById('grafico'))
 
 const legend = grafico.append('svg')
@@ -39,22 +39,59 @@ d3.json('https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/
     d3.json('https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/counties.json').then(pais => {
 
         const EUA = topojson.feature(pais, pais.objects.counties)
+        let id = -1
 
         g.selectAll('path')
             .data(EUA.features)
             .enter()
             .append('path')
             .attr('class', 'county')
+            .attr('id', () =>  {
+                id += 1
+                return id
+            })
             .attr('d', d3.geoPath())
             .attr('transform', `scale(${scale})`)
             .style('fill', (d, i) => { 
-                for(object in educacao){
-                    object = educacao[object]
+                for(indece in educacao){
+                    object = educacao[indece]
                     if(d.id == object.fips){
                         return object.bachelorsOrHigher < 12 ? colors[0] : object.bachelorsOrHigher < 21 ? colors[1] :  object.bachelorsOrHigher < 30 ? colors[2] : object.bachelorsOrHigher < 39 ? colors[3] : object.bachelorsOrHigher < 48 ? colors[4] : object.bachelorsOrHigher < 57 ? colors[5] : colors[6]
                     }
                 }
             })
+            .on('mouseover', function(d, i){
+                d3.select(this)
+                  .style('fill', 'black')
+                
+                d3.select(document.getElementById('grafico'))
+                  .append('div')
+                  .attr('id', 'tooltip')
+                  .html(function(){
+                    for(indece in educacao){
+                        object = educacao[indece]
+                        if(d.id === object.fips){
+                            return `${object.area_name}, ${object.state}: ${object.bachelorsOrHigher}%`
+                        }
+                    }
+                  })
+                  .style('top', $(`#${this.id}`).offset().top - 20 + 'px')
+                  .style('left', $(`#${this.id}`).offset().left + 20 + 'px')
+            })
+            .on('mouseout', function(d, i){
+                d3.select(this)
+                  .style('fill', (d, i) => { 
+                      for(indece in educacao){
+                          object = educacao[indece]
+                          if(d.id == object.fips){
+                              return object.bachelorsOrHigher < 12 ? colors[0] : object.bachelorsOrHigher < 21 ? colors[1] :  object.bachelorsOrHigher < 30 ? colors[2] : object.bachelorsOrHigher < 39 ? colors[3] : object.bachelorsOrHigher < 48 ? colors[4] : object.bachelorsOrHigher < 57 ? colors[5] : colors[6]
+                          }
+                      }
+                  })
+
+                const div = document.getElementById('tooltip')
+                div.parentNode.removeChild(div)
+            })   
 
         legend.selectAll('rect')
               .data(colors)
